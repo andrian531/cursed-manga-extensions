@@ -1,0 +1,39 @@
+name: Build Hentai2Read APK
+
+on:
+  push:
+    branches:
+      - build-apk
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Lint Hentai2Read
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Java
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        with:
+          java-version: 25.0.4+101.0.LTS
+          distribution: temurin
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Build and Lint Hentai2Read
+        run: ./gradlew :src:en:hentai2read:assembleRelease :src:en:hentai2read:lintRelease
+
+      - name: Upload APK
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: hentai2read-apk
+          path: |
+            src/en/hentai2read/build/outputs/apk/release/*.apk
+            src/en/hentai2read/build/outputs/jar/release/*.jar
+          retention-days: 7
